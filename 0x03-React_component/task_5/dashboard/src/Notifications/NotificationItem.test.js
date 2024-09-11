@@ -3,6 +3,10 @@ import NotificationItem from "./NotificationItem";
 import { shallow } from "enzyme";
 
 describe("rendering components", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("renders NotificationItem component without crashing", () => {
     const wrapper = shallow(<NotificationItem />);
 
@@ -13,7 +17,9 @@ describe("rendering components", () => {
     const wrapper = shallow(<NotificationItem />);
 
     wrapper.setProps({ type: "default", value: "test" });
-    expect(wrapper.html()).toEqual('<li data-notification-type="default">test</li>');
+    expect(wrapper.html()).toEqual(
+      '<li data-notification-type="default">test</li>'
+    );
   });
 
   it('renders correct html from  html="<u>test</u>" props', () => {
@@ -22,17 +28,15 @@ describe("rendering components", () => {
     wrapper.setProps({ html: "<u>test</u>" });
     expect(wrapper.html()).toEqual('<li data-urgent="true"><u>test</u></li>');
   });
-});
 
-describe("onclick event behaves as it should", () => {
-  it("should call console.log", () => {
-    const wrapper = shallow(<NotificationItem />);
-    const spy = jest.fn();
+  it("calls the spy with the right ID when simulating a click", () => {
+    const markAsReadSpy = jest.fn();
+    const id = 123;
+    const wrapper = shallow(
+      <NotificationItem id={id} markAsRead={markAsReadSpy} />
+    );
 
-    wrapper.setProps({ value: "test item", markAsRead: spy, id: 1 });
-    wrapper.find("li").props().onClick();
-    expect(spy).toBeCalledTimes(1);
-    expect(spy).toBeCalledWith(1);
-    spy.mockRestore();
+    wrapper.find("li").simulate("click");
+    expect(markAsReadSpy).toHaveBeenCalledWith(id);
   });
 });
